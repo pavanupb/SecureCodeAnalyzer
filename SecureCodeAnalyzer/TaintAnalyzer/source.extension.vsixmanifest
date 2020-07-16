@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
+    <Metadata>
+        <Identity Id="TaintAnalyzer.99320cd6-c899-451b-90dc-e1623466ce11" Version="1.0" Language="en-US" Publisher="Pavan Gurkhi Bhimesh" />
+        <DisplayName>TaintAnalyzer</DisplayName>
+        <Description xml:space="preserve">Empty VSIX Project.</Description>
+    </Metadata>
+    <Installation>
+        <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[15.0,)" />
+    </Installation>
+    <Dependencies>
+        <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
+    </Dependencies>
+    <Prerequisites>
+        <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[16.0,17.0)" DisplayName="Visual Studio core editor" />
+        <Prerequisite Id="Component.Microsoft.VisualStudio.RazorExtension" Version="[16.0,17.0)" DisplayName="Razor Language Services" />
+    </Prerequisites>
+    <Assets>
+        <Asset Type="Microsoft.VisualStudio.Analyzer" d:Source="Project" d:ProjectName="TaintFlowAnalyzer" Path="|TaintFlowAnalyzer|" />
+        <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="TaintFlowAnalyzer" Path="|TaintFlowAnalyzer|" />
+    </Assets>
+</PackageManifest>
