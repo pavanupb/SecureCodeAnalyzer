@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaintFlowAnalyzer", "Secure
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaintAnalyzer.Vsix", "SecureCodeAnalyzer\TaintAnalyzer\TaintAnalyzer.Vsix.csproj", "{8E85A730-CB4D-4ECA-BE95-0664DC376DCF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeAnalyzerInstaller", "SecureCodeAnalyzer\CodeAnalyzerInstaller\CodeAnalyzerInstaller.csproj", "{0B02FB6F-726D-4F74-B82D-E1E04A0E9420}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{8E85A730-CB4D-4ECA-BE95-0664DC376DCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8E85A730-CB4D-4ECA-BE95-0664DC376DCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8E85A730-CB4D-4ECA-BE95-0664DC376DCF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0B02FB6F-726D-4F74-B82D-E1E04A0E9420}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B02FB6F-726D-4F74-B82D-E1E04A0E9420}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B02FB6F-726D-4F74-B82D-E1E04A0E9420}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B02FB6F-726D-4F74-B82D-E1E04A0E9420}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -33,7 +33,7 @@ namespace AESEncryption
                 ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
 
                 var originalText = Encoding.UTF8.GetBytes(plainText);
-                cipherText = encryptor.TransformFinalBlock(originalText, 0, originalText.Length);                
+                cipherText = encryptor.TransformFinalBlock(originalText, 0, originalText.Length);
 
             }
 
