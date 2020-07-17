@@ -36,35 +36,16 @@ namespace SecureCodeAnalyzer
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(HardCodedCheckViolationRule, HardCodedContextCheckViolationRule); } }
 
-        private static ServiceProvider _serviceProvider { get; set; }
-
-
-        public SecureCodeAnalyzerAnalyzer()
-        {
-            /*var services = new ServiceCollection();
-            services.AddSingleton<ICompilationAnalyzer>(new CompilationAnalyzer(HardCodedCheckViolationRule, HardCodedContextCheckViolationRule));
-            _serviceProvider = services.BuildServiceProvider();*/
-
-        }
-
         public override void Initialize(AnalysisContext context)
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
-            //context.EnableConcurrentExecution();
-            //The compilation start action would be invoked always first.
-            CompilationAnalyzer cryptoAnalyzer = new CompilationAnalyzer(HardCodedCheckViolationRule, HardCodedContextCheckViolationRule);
-            context.RegisterCompilationStartAction(cryptoAnalyzer.CompilationStartAction);
-            
+            context.RegisterCompilationStartAction(compilationContext =>
+            {
+                CompilationAnalyzer cryptoAnalyzer = new CompilationAnalyzer(HardCodedCheckViolationRule, HardCodedContextCheckViolationRule);
+                compilationContext.RegisterCodeBlockStartAction<SyntaxKind>(cryptoAnalyzer.AnalyzeCodeBlockStartAction);
+                compilationContext.RegisterCompilationEndAction(cryptoAnalyzer.AnalyzeCompilationEndAction);
+
+            });       
         }
-
-        /*private void CompilationStartAction(CompilationStartAnalysisContext context)
-        {
-            //ICompilationAnalyzer cryptoAnalyzer = _serviceProvider.GetService<ICompilationAnalyzer>();
-            context.RegisterCodeBlockStartAction<SyntaxKind>(cryptoAnalyzer.AnalyzeCodeBlockStartAction);
-
-            context.RegisterCompilationEndAction(cryptoAnalyzer.AnalyzeCompilationEndAction);
-            
-            
-        }        */
     }
 }

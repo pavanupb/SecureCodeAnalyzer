@@ -31,14 +31,7 @@ namespace TaintFlowAnalyzer
             {
                 TaintedContextDictionary = new ConcurrentDictionary<string, List<KeyValuePair<ContextInformation, ISymbol>>>();
             }
-        }
-
-        public void CompilationStartAction(CompilationStartAnalysisContext context)
-        {
-            /*TaintedContextDictionary = new ConcurrentDictionary<string, List<KeyValuePair<ContextInformation, ISymbol>>>();*/
-            context.RegisterCodeBlockStartAction<SyntaxKind>(AnalyzeCodeBlockStartAction);
-            context.RegisterCompilationEndAction(AnalyzeCompilationEndAction);
-        }
+        }        
 
         public void AnalyzeCodeBlockStartAction(CodeBlockStartAnalysisContext<SyntaxKind> context)
         {
