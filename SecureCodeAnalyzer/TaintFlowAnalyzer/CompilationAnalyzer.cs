@@ -17,8 +17,8 @@ namespace TaintFlowAnalyzer
     {        
         private static DiagnosticDescriptor HardCodedCheckViolationRule;
         private static DiagnosticDescriptor HardCodedContextCheckViolationRule;
-        private static List<KeyValuePair<ContextInformation, ISymbol>> TaintedValuesDictionary;
-        private static ConcurrentDictionary<string, List<KeyValuePair<ContextInformation, ISymbol>>> TaintedContextDictionary;
+        private List<KeyValuePair<ContextInformation, ISymbol>> TaintedValuesDictionary;
+        private ConcurrentDictionary<string, List<KeyValuePair<ContextInformation, ISymbol>>> TaintedContextDictionary;
         private readonly HashSet<Diagnostic> _diagnostics = new HashSet<Diagnostic>();
 
 
@@ -681,7 +681,7 @@ namespace TaintFlowAnalyzer
             }
         }
 
-        private static TaintQueryInformation IsTaintedValueExists(ISymbol containingMethod, ISymbol nodeInfo, ISymbol containingObject = null)
+        private TaintQueryInformation IsTaintedValueExists(ISymbol containingMethod, ISymbol nodeInfo, ISymbol containingObject = null)
         {
             TaintQueryInformation taintQueryResult = new TaintQueryInformation();
             try
@@ -778,7 +778,7 @@ namespace TaintFlowAnalyzer
             }
         }
 
-        private static void SanitizeTaintValue(ISymbol containingMethod, ISymbol nodeInfo, ISymbol containingObject)
+        private void SanitizeTaintValue(ISymbol containingMethod, ISymbol nodeInfo, ISymbol containingObject)
         {
             List<KeyValuePair<ContextInformation, ISymbol>> sanitizedValues = new List<KeyValuePair<ContextInformation, ISymbol>>();
 
