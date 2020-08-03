@@ -1,12 +1,18 @@
-﻿using CodeSharpenerCryptoAnalyzer.AnalyzerModels;
+﻿using Analyzer.Utilities;
+using CodeSharpenerCryptoAnalyzer.AnalyzerModels;
 using CodeSharpenerCryptoAnalyzer.Visitors;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.CodeAnalysis.FlowAnalysis;
+using Microsoft.CodeAnalysis.FlowAnalysis.DataFlow;
+using Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.CopyAnalysis;
+using Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 
@@ -20,10 +26,11 @@ namespace TaintFlowAnalyzer
         private List<KeyValuePair<ContextInformation, ISymbol>> TaintedValuesDictionary;
         private ConcurrentDictionary<string, List<KeyValuePair<ContextInformation, ISymbol>>> TaintedContextDictionary;
         private readonly HashSet<Diagnostic> _diagnostics = new HashSet<Diagnostic>();
+        private readonly ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics;
 
 
 
-        public CompilationAnalyzer(DiagnosticDescriptor hardCodedRule, DiagnosticDescriptor hardCodedContextRule)
+        public CompilationAnalyzer(DiagnosticDescriptor hardCodedRule, DiagnosticDescriptor hardCodedContextRule, ImmutableArray<DiagnosticDescriptor> supportedDiagnostics)
         {            
             HardCodedCheckViolationRule = hardCodedRule;
             HardCodedContextCheckViolationRule = hardCodedContextRule;
@@ -31,10 +38,18 @@ namespace TaintFlowAnalyzer
             {
                 TaintedContextDictionary = new ConcurrentDictionary<string, List<KeyValuePair<ContextInformation, ISymbol>>>();
             }
-        }        
+
+            SupportedDiagnostics = supportedDiagnostics;
+
+            /*if (TaintedValuesDictionary == null)
+            {
+                TaintedValuesDictionary = new List<KeyValuePair<ContextInformation, ISymbol>>();
+            }*/
+        } 
 
         public void AnalyzeCodeBlockStartAction(CodeBlockStartAnalysisContext<SyntaxKind> context)
-        {
+        {            
+
             TaintedValuesDictionary = new List<KeyValuePair<ContextInformation, ISymbol>>();
             List<KeyValuePair<ContextInformation, ISymbol>> taintedDictionary = new List<KeyValuePair<ContextInformation, ISymbol>>();
             lock (TaintedContextDictionary)
@@ -67,6 +82,45 @@ namespace TaintFlowAnalyzer
                 }
             }
 
+
+            var controlFlowGraph = ControlFlowGraph.Create(context.CodeBlock, context.SemanticModel);
+            WellKnownTypeProvider wellKnownTypeProvider = WellKnownTypeProvider.GetOrCreate(context.SemanticModel.Compilation);
+            InterproceduralAnalysisConfiguration interproceduralAnalysisConfiguration = InterproceduralAnalysisConfiguration.Create(
+                                                                    context.Options,
+                                                                    SupportedDiagnostics,
+                                                                    context.OwningSymbol,
+                                                                    context.SemanticModel.Compilation,
+                                                                    defaultInterproceduralAnalysisKind: InterproceduralAnalysisKind.ContextSensitive,
+                                                                    cancellationToken: context.CancellationToken);
+
+
+                      
+
+            var pointsToResult = PointsToAnalysis.TryGetOrComputeResult(controlFlowGraph,
+                context.OwningSymbol,
+                context.Options,
+                wellKnownTypeProvider,
+                interproceduralAnalysisConfig: interproceduralAnalysisConfiguration,
+                interproceduralAnalysisPredicateOpt: null
+               );
+
+            var copyAnalysis = CopyAnalysis.TryGetOrComputeResult(controlFlowGraph,
+                context.OwningSymbol,
+                context.Options,
+                wellKnownTypeProvider,
+                interproceduralAnalysisConfiguration,
+                interproceduralAnalysisPredicateOpt: null
+                );
+
+            var exitBlockAliasInfo = copyAnalysis.ExitBlockOutput.Data.Select(x => x).Where(y => y.Value.Kind.Equals(CopyAbstractValueKind.KnownReferenceCopy));
+            var mergeBlockAliasInfo = copyAnalysis.MergedStateForUnhandledThrowOperationsOpt.Data.Select(x => x).Where(y => y.Value.Kind.Equals(CopyAbstractValueKind.KnownReferenceCopy));
+
+            var exitBlockInfo = copyAnalysis.ExitBlockOutput.Data.Select(x => x).Where(y => y.Key.SymbolOpt != null).Select(z => z.Key.SymbolOpt.Name.Equals("aesAlg"));
+            var mergeBlockInfo = copyAnalysis.MergedStateForUnhandledThrowOperationsOpt.Data.Select(x => x).Where(y => y.Key.SymbolOpt != null && y.Key.SymbolOpt.Name.Equals("aesAlg"));
+
+
+
+
             //All the syntax node action goes here
             context.RegisterSyntaxNodeAction(AnalyzeObjectCreation, SyntaxKind.ObjectCreationExpression);
             context.RegisterSyntaxNodeAction(AnalyzeMethodInvocationNode, SyntaxKind.InvocationExpression);
@@ -95,8 +149,8 @@ namespace TaintFlowAnalyzer
             lock (TaintedValuesDictionary)
             {
                 TaintedValuesDictionary.Clear();
-            }
-        }        
+            }            
+        }
 
         public void AnalyzeObjectCreation(SyntaxNodeAnalysisContext context)
         {
@@ -865,6 +919,8 @@ namespace TaintFlowAnalyzer
             {
                 context.ReportDiagnostic(diagnostic);
             }
+
+            TaintedValuesDictionary.Clear();
         }
 
     }    

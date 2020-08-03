@@ -41,9 +41,9 @@ namespace SecureCodeAnalyzer
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.RegisterCompilationStartAction(compilationContext =>
             {
-                CompilationAnalyzer cryptoAnalyzer = new CompilationAnalyzer(HardCodedCheckViolationRule, HardCodedContextCheckViolationRule);
+                CompilationAnalyzer cryptoAnalyzer = new CompilationAnalyzer(HardCodedCheckViolationRule, HardCodedContextCheckViolationRule, SupportedDiagnostics);
                 compilationContext.RegisterCodeBlockStartAction<SyntaxKind>(cryptoAnalyzer.AnalyzeCodeBlockStartAction);
-                compilationContext.RegisterCompilationEndAction(cryptoAnalyzer.AnalyzeCompilationEndAction);
+                compilationContext.RegisterCompilationEndAction(cryptoAnalyzer.AnalyzeCompilationEndAction);                
 
             });       
         }

@@ -14,7 +14,7 @@ namespace TaintFlowAnalyzer
         void AnalyzeSimpleAssignmentExpression(SyntaxNodeAnalysisContext context);
         void AnalyzeLocalDeclarationStatement(SyntaxNodeAnalysisContext context);
         void AnalyzeExpressionStatement(SyntaxNodeAnalysisContext context);
-        void AnalyzeCodeBlockEndAction(CodeBlockAnalysisContext context);
+        //void AnalyzeCodeBlockEndAction(CodeBlockAnalysisContext context);
         void AnalyzeCompilationEndAction(CompilationAnalysisContext context);
     }
 }
