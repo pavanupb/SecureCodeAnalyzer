@@ -6,9 +6,9 @@ namespace AliasAnalysisTest
 {
     public class GetValues
     {
-        public string foo(string recievedText)
+        public byte[] foo(byte[] recievedText)
         {
-            string recievedAliasedText = recievedText;
+            byte[] recievedAliasedText = recievedText;
             return recievedAliasedText;
         }
     }
